@@ -37,6 +37,8 @@ import org.example.project.domain.Quiz
 import org.example.project.presentation.SocraticViewModel
 import org.example.project.ui.components.DocumentViewerPanel
 import org.example.project.ui.components.FlashcardView
+import org.example.project.ui.components.ProgressData
+import org.example.project.ui.components.ProgressTrackerView
 import org.example.project.ui.components.QuizView
 import kotlin.math.sin
 import kotlin.random.Random
@@ -77,40 +79,45 @@ fun ChatScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            Row(
+                modifier = Modifier.weight(1f).fillMaxWidth()
             ) {
-                items(uiState.messages, key = { it.id }) { message ->
-                    ChatBubble(message = message)
-                    val metadata = message.metadata
-                    if (metadata?.mcpWidget != null) {
-                        McpWidgetRenderer(metadata.mcpWidget.data)
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .weight(if (uiState.referencedChunks.isNotEmpty()) 0.6f else 1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.messages, key = { it.id }) { message ->
+                        ChatBubble(message = message)
+                        val metadata = message.metadata
+                        if (metadata?.mcpWidget != null) {
+                            McpWidgetRenderer(metadata.mcpWidget.data)
+                        }
                     }
-                }
 
-                if (uiState.isProcessing) {
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(32.dp),
-                                strokeWidth = 3.dp
-                            )
+                    if (uiState.isProcessing) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(32.dp),
+                                    strokeWidth = 3.dp
+                                )
+                            }
                         }
                     }
                 }
 
                 if (uiState.referencedChunks.isNotEmpty()) {
-                    item {
-                        DocumentViewerPanel(chunks = uiState.referencedChunks)
-                    }
+                    DocumentViewerPanel(
+                        chunks = uiState.referencedChunks,
+                        modifier = Modifier.weight(0.4f).fillMaxWidth().padding(end = 8.dp)
+                    )
                 }
             }
 
@@ -344,7 +351,8 @@ private fun ChatBubble(message: ChatMessage) {
 private data class ParsedWidget(
     val widgetType: String,
     val quiz: Quiz? = null,
-    val flashcard: Flashcard? = null
+    val flashcard: Flashcard? = null,
+    val progressData: ProgressData? = null
 )
 
 @Composable
@@ -375,6 +383,15 @@ private fun McpWidgetRenderer(widgetData: String) {
                     )
                     ParsedWidget(widgetType = widgetType, flashcard = flashcard)
                 }
+                "progress_tracker" -> {
+                    val progress = ProgressData(
+                        label = data?.get("label")?.jsonPrimitive?.content ?: "",
+                        current = data?.get("current")?.jsonPrimitive?.content?.toIntOrNull() ?: 0,
+                        total = data?.get("total")?.jsonPrimitive?.content?.toIntOrNull() ?: 1,
+                        unit = data?.get("unit")?.jsonPrimitive?.content ?: ""
+                    )
+                    ParsedWidget(widgetType = widgetType, progressData = progress)
+                }
                 else -> null
             }
         } catch (_: Exception) { null }
@@ -383,5 +400,6 @@ private fun McpWidgetRenderer(widgetData: String) {
     when (parsed?.widgetType) {
         "quiz_option" -> parsed.quiz?.let { QuizView(quiz = it, onAnswer = {}) }
         "flashcard" -> parsed.flashcard?.let { FlashcardView(flashcard = it) }
+        "progress_tracker" -> parsed.progressData?.let { ProgressTrackerView(progress = it) }
     }
 }

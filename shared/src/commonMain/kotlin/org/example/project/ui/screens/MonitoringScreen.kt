@@ -10,6 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.example.project.core.currentTimeMillis
+import org.example.project.data.report.ReportGenerator
+import org.example.project.data.report.StudyReport
 import org.example.project.domain.Skill
 import org.example.project.domain.Student
 
@@ -73,6 +76,50 @@ fun MonitoringScreen(
             } else {
                 skills.forEach { skill ->
                     SkillCard(skill)
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            val reportText = remember { mutableStateOf<String?>(null) }
+
+            Button(
+                onClick = {
+                    if (student != null) {
+                        val report = StudyReport(
+                            studentName = student.name,
+                            level = student.level,
+                            generatedAt = currentTimeMillis(),
+                            totalStudyMinutes = student.studyTimeMinutes,
+                            averageScore = student.averageScore,
+                            skills = skills,
+                            recommendations = skills
+                                .filter { it.proficiency < 50.0 }
+                                .map { "Renforcer ${it.name} (${"%.0f".format(it.proficiency)}%) — cibler des exercices dans cette matière." }
+                        )
+                        reportText.value = ReportGenerator.generateTextReport(report)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Générer le bilan de compétences")
+            }
+
+            reportText.value?.let { text ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Text(
+                        text = text,
+                        modifier = Modifier.padding(16.dp).verticalScroll(rememberScrollState()),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                    )
                 }
             }
         }

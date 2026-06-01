@@ -64,7 +64,8 @@ class OpenAIApiService(
     @Serializable
     data class OpenAIRequest(
         val model: String,
-        val messages: List<ChatMessage>
+        val messages: List<ChatMessage>,
+        val max_tokens: Int = Constants.MAX_CONTEXT_TOKENS
     )
 
     @Serializable
