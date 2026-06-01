@@ -1,24 +1,33 @@
 package org.example.project.data.remote
 
 import io.ktor.client.HttpClient
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.example.project.core.Constants
+import org.example.project.domain.ServerConfig
 
-class OpenAIApiService(private val httpClient: HttpClient) : IAiService {
+class OpenAIApiService(
+    private val httpClient: HttpClient,
+    private var config: ServerConfig = ServerConfig()
+) : IAiService {
 
-    // Configure to use a locally running OpenAI-compatible server
-    private val LOCAL_LLM_SERVER_URL = "http://localhost:11434" // Default Ollama endpoint
-    private val OPENAI_COMPATIBLE_ENDPOINT = "/v1/chat/completions" // Common endpoint for OpenAI-compatible servers
+    fun updateConfig(newConfig: ServerConfig) {
+        config = newConfig
+    }
+
+    fun getConfig(): ServerConfig = config
 
     override suspend fun generateContent(prompt: String): String {
         try {
             val requestBody = OpenAIRequest(
-                model = "local-model", // This will be determined by the local server's configuration
+                model = config.modelName,
                 messages = listOf(
                     ChatMessage(
                         role = "system",
@@ -32,14 +41,12 @@ class OpenAIApiService(private val httpClient: HttpClient) : IAiService {
             )
 
             val response = httpClient.post {
-                url("$LOCAL_LLM_SERVER_URL$OPENAI_COMPATIBLE_ENDPOINT")
+                url("${config.serverUrl}${config.apiEndpoint}")
+                contentType(ContentType.Application.Json)
+                if (config.apiKey.isNotBlank()) {
+                    header("Authorization", "Bearer ${config.apiKey}")
+                }
                 setBody(requestBody)
-                // Local servers might not require an API key, or might use a different header.
-                // If your local server requires a key, uncomment and set it here.
-                // headers {
-                //     append("Authorization", "Bearer YOUR_LOCAL_SERVER_API_KEY")
-                //     append("Content-Type", "application/json")
-                // }
             }
 
             val responseBody = response.bodyAsText()
@@ -50,12 +57,9 @@ class OpenAIApiService(private val httpClient: HttpClient) : IAiService {
 
         } catch (e: Exception) {
             println("Error generating content from local LLM server: ${e.message}")
-            // Provide a more user-friendly error message or guidance
-            return "Error: Could not connect to the local AI server. Please ensure it is running and accessible at $LOCAL_LLM_SERVER_URL. Details: ${e.message}"
+            return "Error: Could not connect to the AI server at ${config.serverUrl}. Details: ${e.message}"
         }
     }
-
-    // --- Data Classes for OpenAI API Request and Response ---
 
     @Serializable
     data class OpenAIRequest(

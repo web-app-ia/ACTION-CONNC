@@ -1,6 +1,10 @@
-package org.example.project.components
+package org.example.project.ui.components
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -44,7 +48,7 @@ fun FlashcardView(
             AnimatedContent(
                 targetState = isFlipped,
                 transitionSpec = {
-                    crossfade(animationSpec = tween(300))
+                    fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(300))
                 },
                 label = "flashcard_flip"
             ) { flipped ->

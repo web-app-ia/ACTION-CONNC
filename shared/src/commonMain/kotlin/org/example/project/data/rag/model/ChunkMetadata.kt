@@ -1,7 +1,11 @@
 package org.example.project.data.rag.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ChunkMetadata(
-    val source: String,
+    val sourceFile: String,
+    val fileType: String,
     val pageNumber: Int? = null,
-    val position: Int? = null
+    val localUri: String? = null
 )

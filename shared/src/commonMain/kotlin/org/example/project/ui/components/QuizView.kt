@@ -1,4 +1,4 @@
-package org.example.project.components
+package org.example.project.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.example.project.core.currentTimeMillis
 import org.example.project.domain.Quiz
 import org.example.project.domain.QuizResult
 
@@ -87,7 +88,7 @@ fun QuizView(
                                 studentId = "",
                                 selectedAnswerIndex = selectedIndex!!,
                                 isCorrect = selectedIndex == quiz.correctAnswerIndex,
-                                timestamp = System.currentTimeMillis()
+                                timestamp = currentTimeMillis()
                             )
                         )
                     },

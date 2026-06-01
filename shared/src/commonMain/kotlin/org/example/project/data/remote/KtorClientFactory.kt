@@ -1,7 +1,6 @@
 package org.example.project.data.remote
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -11,7 +10,7 @@ import kotlinx.serialization.json.Json
 
 object KtorClientFactory {
     fun create(): HttpClient {
-        return HttpClient(CIO) {
+        return HttpClient {
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true
@@ -27,7 +26,6 @@ object KtorClientFactory {
                     }
                 }
             }
-            // Add other configurations like default headers, timeouts, etc. if needed
         }
     }
 }

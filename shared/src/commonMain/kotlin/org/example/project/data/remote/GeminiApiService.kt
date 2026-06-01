@@ -1,8 +1,6 @@
 package org.example.project.data.remote
 
 import org.example.project.core.Constants
-import org.example.project.data.rag.model.Chunk
-import org.example.project.data.rag.model.ChunkMetadata
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -74,14 +72,4 @@ class GeminiApiService(private val httpClient: HttpClient) : IAiService {
         val content: Content
     )
 
-    // --- Dummy data classes for RAG simulation ---
-    // These would be replaced by actual data models when integrating with a vector database
-    data class RAGResult(
-        val chunks: List<Chunk>
-    )
-
-    data class Chunk(
-        val content: String,
-        val metadata: ChunkMetadata
-    )
 }
