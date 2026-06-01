@@ -30,9 +30,14 @@ actual class SqlDatabase(private val connection: java.sql.Connection) {
 }
 
 actual fun createSqlDatabase(name: String): SqlDatabase {
-    val dbDir = File(System.getProperty("user.home"), ".tutoriaiad")
-    dbDir.mkdirs()
-    val url = "jdbc:sqlite:${File(dbDir, "$name.db").absolutePath}"
-    val conn = DriverManager.getConnection(url)
-    return SqlDatabase(conn)
+    try {
+        Class.forName("org.sqlite.JDBC")
+        val dbDir = File(System.getProperty("user.home"), ".tutoriaiad")
+        dbDir.mkdirs()
+        val url = "jdbc:sqlite:${File(dbDir, "$name.db").absolutePath}"
+        val conn = DriverManager.getConnection(url)
+        return SqlDatabase(conn)
+    } catch (e: Exception) {
+        throw RuntimeException("Impossible d'ouvrir la base SQLite: ${e.message}", e)
+    }
 }

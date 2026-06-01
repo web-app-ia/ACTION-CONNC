@@ -14,7 +14,7 @@ RÈGLES STRICTES :
     const val OPENAI_COMPATIBLE_ENDPOINT = "/v1/chat/completions"
     const val MAX_CONTEXT_TOKENS = 2048
 
-    const val APP_VERSION = "1.0.0"
+    const val APP_VERSION = "1.0.1"
     const val GITHUB_REPO_OWNER = "web-app-ia"
     const val GITHUB_REPO_NAME = "ACTION-CONNC"
 }
