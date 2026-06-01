@@ -4,7 +4,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
-    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -13,61 +14,60 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "Shared"
+            baseName = "ComposeApp"
             isStatic = true
         }
     }
-    
+
     jvm()
-    
+
     js {
         browser()
     }
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }
-    
+
     androidLibrary {
-       namespace = "org.example.project.shared"
+       namespace = "org.example.project.composeapp"
        compileSdk = libs.versions.android.compileSdk.get().toInt()
        minSdk = libs.versions.android.minSdk.get().toInt()
-    
        compilerOptions {
            jvmTarget = JvmTarget.JVM_11
        }
        androidResources {
            enable = true
        }
-       withHostTest {
-           isIncludeAndroidResources = true
-       }
     }
-    
+
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.client.logging)
-            implementation(libs.ktor.serialization.kotlinx.json)
-        }
-        jvmMain.dependencies {
-            implementation(libs.ktor.client.cio)
-            implementation(libs.sqlite.jdbc)
-            implementation(libs.tess4j)
-            implementation(libs.pdfbox)
+            implementation(projects.shared)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.components.resources)
+            implementation(libs.compose.uiToolingPreview)
+            implementation(libs.androidx.lifecycle.viewmodelCompose)
+            implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
         }
         androidMain.dependencies {
-            implementation(libs.ktor.client.cio)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+            implementation(libs.compose.uiToolingPreview)
         }
         jsMain.dependencies {
             implementation(libs.wrappers.browser)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
     }
+}
+
+dependencies {
+    androidRuntimeClasspath(libs.compose.uiTooling)
 }
