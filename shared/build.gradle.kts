@@ -62,6 +62,8 @@ kotlin {
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.cio)
+            implementation("com.google.mlkit:vision-common:17.3.0")
+            implementation("com.google.mlkit:text-recognition:16.0.1")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

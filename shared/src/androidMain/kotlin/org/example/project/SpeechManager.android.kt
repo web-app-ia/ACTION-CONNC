@@ -72,4 +72,14 @@ class AndroidSpeechManager(private val context: android.content.Context) : Speec
         tts?.shutdown()
         speechRecognizer?.destroy()
     }
+
+    companion object {
+        var appContext: android.content.Context? = null
+    }
+}
+
+actual fun createSpeechManager(): SpeechManager {
+    val ctx = AndroidSpeechManager.appContext
+        ?: error("Call AndroidSpeechManager.appContext = context before createSpeechManager()")
+    return AndroidSpeechManager(ctx)
 }

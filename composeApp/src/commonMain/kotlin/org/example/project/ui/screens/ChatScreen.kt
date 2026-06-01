@@ -93,8 +93,9 @@ fun ChatScreen(
                     items(uiState.messages, key = { it.id }) { message ->
                         ChatBubble(message = message)
                         val metadata = message.metadata
-                        if (metadata?.mcpWidget != null) {
-                            McpWidgetRenderer(metadata.mcpWidget.data)
+                        val mcpWidget = metadata?.mcpWidget
+                        if (mcpWidget != null) {
+                            McpWidgetRenderer(mcpWidget.data)
                         }
                     }
 

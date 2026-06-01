@@ -63,3 +63,5 @@ class IosSpeechManager : SpeechManager {
         isSpeaking = false
     }
 }
+
+actual fun createSpeechManager(): SpeechManager = IosSpeechManager()

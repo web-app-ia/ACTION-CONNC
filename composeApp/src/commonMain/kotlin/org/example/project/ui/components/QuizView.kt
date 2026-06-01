@@ -101,7 +101,7 @@ fun QuizView(
             if (hasSubmitted && quiz.explanation != null) {
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = quiz.explanation,
+                    text = quiz.explanation!!,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
