@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.example.project.core.currentTimeMillis
 import org.example.project.domain.ChatMessage
 import org.example.project.domain.Flashcard
 import org.example.project.domain.MessageRole
@@ -200,7 +201,7 @@ fun ChatScreen(
                         shape = RoundedCornerShape(24.dp),
                         modifier = Modifier.height(40.dp)
                     ) {
-                        Text("➤", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text("✈", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
                 }
             }
@@ -211,7 +212,7 @@ fun ChatScreen(
 }
 
 @Composable
-private fun RecordingBar(onStop: () -> Unit) {
+fun RecordingBar(onStop: () -> Unit) {
     var seconds by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
@@ -219,13 +220,6 @@ private fun RecordingBar(onStop: () -> Unit) {
             delay(1000)
             seconds++
         }
-    }
-
-    val spectrogramHeights = remember { mutableStateListOf<Float>() }
-    val infiniteTransition = rememberInfiniteTransition(label = "spectro")
-
-    if (spectrogramHeights.isEmpty()) {
-        repeat(24) { spectrogramHeights.add(Random.nextFloat()) }
     }
 
     val barCount = 24
@@ -238,7 +232,7 @@ private fun RecordingBar(onStop: () -> Unit) {
         while (true) {
             delay(80)
             for (i in 0 until barCount) {
-                val time = System.currentTimeMillis() / 1000.0
+                val time = currentTimeMillis() / 1000.0
                 val wave = (sin(time * 8.0 + i * 0.5) + 1.0) / 2.0
                 val noise = Random.nextFloat() * 0.3f
                 animatedHeights[i] = (wave.toFloat() * 0.7f + noise).coerceIn(0.1f, 1f)
