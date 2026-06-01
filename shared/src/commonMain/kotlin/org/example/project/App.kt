@@ -7,10 +7,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import org.example.project.core.Constants
 import org.example.project.data.cache.InMemoryDatabase
 import org.example.project.data.network.KtorClientFactory
 import org.example.project.data.rag.RagEngine
 import org.example.project.data.remote.AiServiceFactory
+import org.example.project.data.update.UpdateChecker
+import org.example.project.data.update.UpdateInstaller
 import org.example.project.domain.ServerConfig
 import org.example.project.domain.Student
 import org.example.project.domain.Skill
@@ -29,9 +32,19 @@ fun App() {
     val database = remember { InMemoryDatabase() }
     val ragEngine = remember { RagEngine() }
     val httpClient = remember { KtorClientFactory.createLocalClient() }
+    val cloudClient = remember { KtorClientFactory.createCloudClient() }
     val aiService = remember { AiServiceFactory.getAiService(httpClient) }
     val speechManager = remember { createSpeechManager() }
     val viewModel = remember { SocraticViewModel(aiService, database, ragEngine, speechManager) }
+    val updateChecker = remember {
+        UpdateChecker(
+            httpClient = cloudClient,
+            repoOwner = Constants.GITHUB_REPO_OWNER,
+            repoName = Constants.GITHUB_REPO_NAME,
+            currentVersion = org.example.project.data.update.AppVersion.parse(Constants.APP_VERSION)
+        )
+    }
+    val updateInstaller = remember { UpdateInstaller(httpClient = cloudClient) }
 
     var currentScreen by remember { mutableStateOf(Screen.CHAT) }
     var serverConfig by remember { mutableStateOf(ServerConfig()) }
@@ -118,6 +131,8 @@ fun App() {
                             testResult = "Test non disponible (serveur distant requis)"
                         },
                         testResult = testResult,
+                        updateChecker = updateChecker,
+                        updateInstaller = updateInstaller,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
