@@ -2,7 +2,6 @@ package org.example.project.data.rag
 
 import org.example.project.data.rag.model.Chunk
 import org.example.project.data.rag.model.ChunkMetadata
-import kotlin.random.Random
 
 class RagEngine {
 

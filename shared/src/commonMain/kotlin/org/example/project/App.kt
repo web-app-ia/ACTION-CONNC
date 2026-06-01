@@ -8,10 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import org.example.project.core.Constants
-import org.example.project.data.cache.InMemoryDatabase
+import org.example.project.data.cache.SqliteDatabase
 import org.example.project.data.network.KtorClientFactory
 import org.example.project.data.rag.RagEngine
 import org.example.project.data.remote.AiServiceFactory
+import org.example.project.data.sync.SyncManager
 import org.example.project.data.update.UpdateChecker
 import org.example.project.data.update.UpdateInstaller
 import org.example.project.domain.ServerConfig
@@ -29,7 +30,7 @@ enum class Screen {
 
 @Composable
 fun App() {
-    val database = remember { InMemoryDatabase() }
+    val database = remember { SqliteDatabase() }
     val ragEngine = remember { RagEngine() }
     val httpClient = remember { KtorClientFactory.createLocalClient() }
     val cloudClient = remember { KtorClientFactory.createCloudClient() }

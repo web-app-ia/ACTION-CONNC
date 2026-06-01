@@ -148,7 +148,17 @@ class ImageParser : FileParser {
 
     override fun parse(content: ByteArray, fileName: String, fileType: String, localUri: String?): ParsedDocument? {
         return ParsedDocument(
-            content = "[Image: $fileName - L'OCR sera disponible avec un module natif]",
+            content = "[Image: $fileName - OCR en cours...]",
+            fileName = fileName,
+            fileType = fileType,
+            localUri = localUri
+        )
+    }
+
+    suspend fun parseWithOcr(content: ByteArray, fileName: String, fileType: String, localUri: String?): ParsedDocument? {
+        val text = ocrImage(content, fileName)
+        return ParsedDocument(
+            content = text,
             fileName = fileName,
             fileType = fileType,
             localUri = localUri
