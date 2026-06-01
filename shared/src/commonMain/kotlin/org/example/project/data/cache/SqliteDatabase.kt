@@ -1,8 +1,5 @@
 package org.example.project.data.cache
 
-import org.apache.pdfbox.pdmodel.font.PDType0Font
-import org.apache.pdfbox.pdmodel.font.PDType1Font
-
 class SqliteDatabase(private val name: String = "tutoriaiad") : LocalDatabase {
     private val db = createSqlDatabase(name)
 
